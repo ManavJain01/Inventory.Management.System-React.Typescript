@@ -1,4 +1,22 @@
 {
-  "welcome": "Welcome",
-  "description": "This is an internationalized React project."
+  "header": {
+    "title": "Inventory Management System",
+    "profile": "Profile",
+    "login": "Login",
+    "signup": "Signup",
+    "logout": "Logout",
+    "home": "Home",
+    "products": "Products",
+    "warehouses": "Warehouses"
+  },
+  "home page": {
+    "welcome": "Welcome to the Inventory Management System",
+    "description": "Manage your users, products, and warehouses efficiently and effectively."
+  },
+  "footer": {
+    "copyright": "Copyright © 2025 Inventory Management System. All rights reserved.",
+    "contact": "Contact Us",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
+  }
 }

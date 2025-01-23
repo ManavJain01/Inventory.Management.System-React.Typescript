@@ -1,36 +1,119 @@
-import { Box, Button, Typography } from "@mui/material";
-import React, { Suspense } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+} from "@mui/material";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-// Lazy load your component
-const LazyComponent = React.lazy(() => import('../components/LazyComponent'));
+const HomePage: React.FC = () => {
+  const { t } = useTranslation();
 
-const Home: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        gap: 4,
+        textAlign: "center",
+        p: 3,
+      }}
+    >
+      <Button color="primary" variant="contained">
+        Primary Button
+      </Button>
 
-  const changeLanguage = (language: string) => {
-    i18n.changeLanguage(language); // Change the current language
-  };
-  
-  return <Box>
-    <Typography variant="h6">Homepage</Typography>
+      <Typography variant="h3" component="h1" gutterBottom>
+        {t("home page.welcome")}
+      </Typography>
+      <Typography variant="h6" gutterBottom>
+        {t("home page.description")}
+      </Typography>
 
-    <Button color="primary" variant="contained">
-      Primary Button
-    </Button>
+      <Grid container spacing={3} justifyContent="center">
+        <Grid item xs={12} sm={6} md={4}>
+          <Card sx={{ maxWidth: 345 }}>
+            <CardContent>
+              <Typography variant="h5" component="div" gutterBottom>
+                Manage Users
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Add, update, and delete user profiles with ease.
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                component={Link}
+                to="/users"
+                variant="contained"
+              >
+                Go to Users
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
 
-    <Suspense fallback={<div>Loading...</div>}>
-      <LazyComponent />
-    </Suspense>
+        <Grid item xs={12} sm={6} md={4}>
+          <Card sx={{ maxWidth: 345 }}>
+            <CardContent>
+              <Typography variant="h5" component="div" gutterBottom>
+                Manage Products
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Track and organize your product inventory effortlessly.
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                component={Link}
+                to="/products"
+                variant="contained"
+              >
+                Go to Products
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
 
-    <div>
-      <h1>{t('welcome')}</h1>
-      <p>{t('description')}</p>
-      <button onClick={() => changeLanguage('en')}>English</button>
-      <button onClick={() => changeLanguage('es')}>Español</button>
-      <button onClick={() => changeLanguage('fr')}>Français</button>
-    </div>
-  </Box>;
+        <Grid item xs={12} sm={6} md={4}>
+          <Card sx={{ maxWidth: 345 }}>
+            <CardContent>
+              <Typography variant="h5" component="div" gutterBottom>
+                Manage Warehouses
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Keep track of warehouse locations and stock levels.
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button
+                size="small"
+                component={Link}
+                to="/warehouses"
+                variant="contained"
+              >
+                Go to Warehouses
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Button variant="outlined" component={Link} to="/signup">
+        Get Started
+      </Button>
+    </Box>
+  );
 };
 
-export default Home;
+export default HomePage;

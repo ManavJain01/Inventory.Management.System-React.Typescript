@@ -11,10 +11,10 @@ interface AuthState {
 
 // Define the initial state using that type
 const initialState: AuthState = {
-  accessToken: "",
-  refreshToken: "",
-  isAuthenticated: false,
-  loading: true,
+  accessToken: localStorage.getItem("accessToken") || "",
+  refreshToken: localStorage.getItem("accessToken") || "",
+  isAuthenticated: localStorage.getItem("accessToken") ? true : false,
+  loading: localStorage.getItem("accessToken") ? false : true,
 };
 
 export const authSlice = createSlice({
@@ -36,6 +36,8 @@ export const authSlice = createSlice({
       state.accessToken = "";
       state.refreshToken = "";
       state.isAuthenticated = false;
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     },
   },
 });

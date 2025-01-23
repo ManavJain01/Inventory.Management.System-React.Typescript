@@ -1,0 +1,19 @@
+#basicLayout{
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+#dark{
+    background-color: black;
+    color: white;
+}
+
+#light{
+    background-color: lightblue;
+    color: black;
+}
+
+a{
+    color: inherit;
+    text-decoration: none;
+}
