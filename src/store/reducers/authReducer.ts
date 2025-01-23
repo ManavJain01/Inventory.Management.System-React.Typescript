@@ -1,33 +1,64 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 
 // Define a type for the slice state
 interface AuthState {
+  name: string,
+  email: string,
+  role: string,
   accessToken: string;
   refreshToken: string;
   isAuthenticated: boolean;
-  loading: boolean;
 }
 
 // Define the initial state using that type
 const initialState: AuthState = {
+  name: localStorage.getItem("name") || "",
+  email: localStorage.getItem("email") || "",
+  role: localStorage.getItem("role") || "",
   accessToken: localStorage.getItem("accessToken") || "",
   refreshToken: localStorage.getItem("accessToken") || "",
   isAuthenticated: localStorage.getItem("accessToken") ? true : false,
-  loading: localStorage.getItem("accessToken") ? false : true,
 };
 
 export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setLoading: (state, action: PayloadAction<{ loading: boolean }>) => {
-      state.loading = action.payload.loading;
+    setUser: (state, action: PayloadAction<{ name: string; email: string; role: string; }>) => {
+      if(!action.payload.name && !action.payload.email && !action.payload.role){
+        toast.error("User Credentials not found");
+        resetTokens();
+        throw new Error("User Credentials not found!!!");
+      }
+
+      localStorage.setItem("name", action.payload.name);
+      localStorage.setItem("email", action.payload.email);
+      localStorage.setItem("role", action.payload.role);
+      state.name = action.payload.name;
+      state.email = action.payload.email;
+      state.role = action.payload.role;
+    },
+    logoutUser: (state) => {
+      state.name = "";
+      state.email = "";
+      state.role = "";
+      localStorage.removeItem("name");
+      localStorage.removeItem("email");
+      localStorage.removeItem("role");
     },
     setTokens: (
       state,
       action: PayloadAction<{ accessToken: string; refreshToken: string }>
     ) => {
+      if(!action.payload.accessToken && !action.payload.refreshToken){
+        toast.error("Tokens not found");
+        throw new Error("Tokens not found!!!");
+      }
+
+      localStorage.setItem("accessToken", action.payload.accessToken);
+      localStorage.setItem("refreshToken", action.payload.refreshToken);
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.isAuthenticated = true;
@@ -42,6 +73,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setLoading, setTokens, resetTokens } = authSlice.actions;
+export const { setTokens, resetTokens, setUser, logoutUser } = authSlice.actions;
 
 export default authSlice.reducer;

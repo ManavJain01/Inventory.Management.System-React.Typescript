@@ -15,11 +15,14 @@ import { ThemeContext } from "../ThemeContext";
 import { ReactComponent as Logo } from "../../public/vite.svg";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAppSelector } from "../store/store";
+import { useAppDispatch, useAppSelector } from "../store/store";
+import { resetTokens, logoutUser } from "../store/reducers/authReducer";
 
 const Header: React.FC = () => {
   // useSelector
   const authData = useAppSelector((store) => store.auth);
+
+  const dispatch = useAppDispatch();
 
   // Context APi
   const themeContext = useContext(ThemeContext);
@@ -28,17 +31,19 @@ const Header: React.FC = () => {
     throw new Error("ThemeContext must be used within a ThemeContextProvider");
   }
 
-  const username = "Manav"; // Replace with dynamic username
-
   // useState
   const { toggleTheme, mode } = themeContext;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [username, setUsername] = useState<string>("user");
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   // useEffect
   useEffect(() => {
-    if (authData.accessToken) handleAuthentication(true);
-  }, []);
+    if (authData.accessToken && authData.name) {
+      setUsername(authData.name || "user");
+      handleAuthentication(true);
+    } else handleAuthentication(false);
+  }, [authData]);
 
   // Functions
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -51,6 +56,12 @@ const Header: React.FC = () => {
 
   const handleAuthentication = (bool: boolean) => {
     setIsAuthenticated(bool);
+  };
+
+  const handleLogout = () => {
+    dispatch(resetTokens());
+    dispatch(logoutUser());
+    handleAuthentication(false);
   };
 
   return (
@@ -82,9 +93,15 @@ const Header: React.FC = () => {
                 onClose={handleMenuClose}
               >
                 <MenuItem onClick={handleMenuClose}>
-                  <Link to="/profile">Profile</Link>
+                  <Link to="/profile" style={{ margin: "0 auto" }}>
+                    Profile
+                  </Link>
                 </MenuItem>
-                <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+                <MenuItem onClick={handleMenuClose}>
+                  <Button color="inherit" onClick={handleLogout}>
+                    Logout
+                  </Button>
+                </MenuItem>
               </Menu>
             </div>
           ) : (

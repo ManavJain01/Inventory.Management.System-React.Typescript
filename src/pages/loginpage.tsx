@@ -1,30 +1,40 @@
 import React, { useState } from "react";
 import { useLoginMutation } from "../services/api";
-import { useDispatch } from "react-redux";
-import {
-  setLoading,
-  setTokens,
-  resetTokens,
-} from "../store/reducers/authReducer";
+import { setTokens, setUser } from "../store/reducers/authReducer";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Box, Button, TextField, Typography } from "@mui/material";
+import { useAppDispatch } from "../store/store";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginRequest, { isLoading, error }] = useLoginMutation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const data = await loginRequest({ email, password }).unwrap();
-      console.log("data in login: ", data);
 
-      //   dispatch(login(data.token));
-      alert("Login Successful");
+      dispatch(
+        setTokens({
+          accessToken: data.data.accessToken,
+          refreshToken: data.data.refreshToken,
+        })
+      );
+
+      dispatch(
+        setUser({
+          name: data.data.user.name,
+          email: data.data.user.email,
+          role: data.data.user.role,
+        })
+      );
+      toast.success("Login Successful");
     } catch (err) {
       console.error(err);
-      alert("Login Failed");
+      toast.error("Login Failed");
     }
   };
 
