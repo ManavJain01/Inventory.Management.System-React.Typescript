@@ -1,27 +1,58 @@
-// src/components/ProfileForm.tsx
-
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { TextField, Button, Box, Typography } from "@mui/material";
+import { useForm } from "react-hook-form"; // No need to import setValue explicitly
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  FormControl,
+  Select,
+  MenuItem,
+  FormHelperText,
+  Stack,
+} from "@mui/material";
 import axios from "axios";
 import styles from "./ProfileForm.module.css";
+import { useAppSelector } from "../../store/store";
+import { useUpdateUserMutation } from "../../services/api";
 
 interface FormData {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
-  phone: string;
+  role: string;
 }
 
 const ProfileForm: React.FC = () => {
-  const [profile, setProfile] = useState<FormData | null>(null);
+  // uaseSelector
+  const authData = useAppSelector((store) => store.auth);
+
+  const [updateProfile, { isLoading }] = useUpdateUserMutation();
+
+  // useState
+  const [profile, setProfile] = useState<FormData>({
+    name: "",
+    email: "",
+    role: "",
+  });
   const [isEditing, setIsEditing] = useState(false);
+
+  // useEffect
+  useEffect(() => {
+    if (authData.name || authData.email || authData.role) {
+      setProfile({
+        name: authData.name,
+        email: authData.email,
+        role: authData.role,
+      });
+    }
+    // fetchProfile(); // Fetch profile data when component mounts
+  }, []);
 
   const {
     register,
-    handleSubmit,
     reset,
     formState: { errors },
+    setValue, // Accessing setValue from useForm
   } = useForm<FormData>();
 
   // Fetch the profile data from the backend (Mock API)
@@ -35,14 +66,12 @@ const ProfileForm: React.FC = () => {
   };
 
   // Create or Update the profile
-  const onSubmit = async (data: FormData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      if (isEditing) {
-        await axios.put("/api/profile", data); // Mock API endpoint for updating
-      } else {
-        await axios.post("/api/profile", data); // Mock API endpoint for creating
-      }
-      fetchProfile(); // Refresh profile data after submitting
+      const data = await updateProfile({ id: authData.id, data: profile });
+      console.log("data: ", data);
+
       setIsEditing(false);
     } catch (error) {
       console.error("Error submitting profile:", error);
@@ -53,7 +82,7 @@ const ProfileForm: React.FC = () => {
   const handleDelete = async () => {
     try {
       await axios.delete("/api/profile"); // Mock API endpoint for deleting
-      setProfile(null); // Clear profile state
+      setProfile({ name: "", email: "", role: "" }); // Clear profile state
       reset(); // Reset form
     } catch (error) {
       console.error("Error deleting profile:", error);
@@ -68,34 +97,34 @@ const ProfileForm: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchProfile(); // Fetch profile data when component mounts
-  }, []);
+  if (!profile)
+    return (
+      <Stack direction="column" gap="20px">
+        <Typography variant="h4" className={styles.title}>
+          Profile
+        </Typography>
 
-  return (
-    <Box className={styles.formContainer}>
-      <Typography variant="h4" className={styles.title}>
-        {isEditing ? "Edit Profile" : "Profile"}
-      </Typography>
+        <Typography variant="h6">
+          No profile found. Create a new one.
+        </Typography>
+      </Stack>
+    );
+  else
+    return (
+      <Box className={styles.formContainer}>
+        <Typography variant="h4" className={styles.title}>
+          Edit Profile
+        </Typography>
 
-      {profile ? (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit}>
           <TextField
-            {...register("firstName", { required: "First name is required" })}
-            label="First Name"
+            {...register("name", { required: "Name is required" })}
+            label={"Name"}
             fullWidth
             margin="normal"
-            error={!!errors.firstName}
-            helperText={errors.firstName?.message}
-            disabled={!isEditing}
-          />
-          <TextField
-            {...register("lastName", { required: "Last name is required" })}
-            label="Last Name"
-            fullWidth
-            margin="normal"
-            error={!!errors.lastName}
-            helperText={errors.lastName?.message}
+            error={!!errors.name}
+            helperText={errors.name?.message}
+            autoFocus
             disabled={!isEditing}
           />
           <TextField
@@ -106,25 +135,37 @@ const ProfileForm: React.FC = () => {
                 message: "Invalid email address",
               },
             })}
-            label="Email"
+            autoFocus
+            label={"Email"}
             fullWidth
             margin="normal"
             error={!!errors.email}
             helperText={errors.email?.message}
             disabled={!isEditing}
           />
-          <TextField
-            {...register("phone", { required: "Phone number is required" })}
-            label="Phone Number"
-            fullWidth
-            margin="normal"
-            error={!!errors.phone}
-            helperText={errors.phone?.message}
-            disabled={!isEditing}
-          />
+          <FormControl fullWidth margin="normal" error={!!errors.role}>
+            <Select
+              labelId="role-label"
+              {...register("role", { required: "Role is required" })}
+              value={profile.role}
+              onChange={(e) => setValue("role", e.target.value)} // Corrected here
+              disabled={!isEditing}
+            >
+              <MenuItem value="USER">USER</MenuItem>
+              <MenuItem value="ADMIN">ADMIN</MenuItem>
+              <MenuItem value="MANAGER">MANAGER</MenuItem>
+            </Select>
+            <FormHelperText>{errors.role?.message}</FormHelperText>
+          </FormControl>
 
           {isEditing ? (
-            <Button type="submit" variant="contained" color="primary" fullWidth>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={() => handleDelete}
+            >
               Save Changes
             </Button>
           ) : (
@@ -148,13 +189,8 @@ const ProfileForm: React.FC = () => {
             </Box>
           )}
         </form>
-      ) : (
-        <Typography variant="h6">
-          No profile found. Create a new one.
-        </Typography>
-      )}
-    </Box>
-  );
+      </Box>
+    );
 };
 
 export default ProfileForm;

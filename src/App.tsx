@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 
 // Importing Layouts
 import Basic from "./layouts/Basic";
+import Warehouse from "./layouts/Warehouse";
 
 // Importing Components
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -18,7 +19,9 @@ import SignUp from "./pages/signup";
 import Login from "./pages/loginpage";
 import NotFoundPage from "./pages/notfoundpage";
 const ProfilePage = React.lazy(() => import("./pages/profilepage"));
-const WarehousePage = React.lazy(() => import("./pages/warehousepage"));
+const ShowWarehouse = React.lazy(
+  () => import("./pages/Warehouse/showWarehouse")
+);
 const ProductPage = React.lazy(() => import("./pages/productpage"));
 
 const App: React.FC = () => {
@@ -62,11 +65,13 @@ const App: React.FC = () => {
             element={
               <ErrorBoundary>
                 <Suspense fallback={<LoadingPage />}>
-                  <WarehousePage />
+                  <Warehouse />
                 </Suspense>
               </ErrorBoundary>
             }
-          />
+          >
+            {/* <Route path="/" element={<ShowWarehouse />} /> */}
+          </Route>
           <Route
             path="/products"
             element={

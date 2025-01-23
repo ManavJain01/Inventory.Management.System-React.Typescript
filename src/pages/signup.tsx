@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { useSignUpMutation } from "../services/api";
-import { useDispatch } from "react-redux";
-import {
-  setTokens,
-  resetTokens,
-  setLoading,
-} from "../store/reducers/authReducer";
+import { setTokens, setUser } from "../store/reducers/authReducer";
 import {
   Box,
   Button,
@@ -17,6 +12,9 @@ import {
   InputLabel,
   FormControl,
 } from "@mui/material";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAppDispatch } from "../store/store";
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -24,20 +22,32 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("USER"); // Default role is USER
   const [signUp, { isLoading, error }] = useSignUpMutation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const data = await signUp({ name, email, password, role }).unwrap();
-      console.log("data in signup:", data);
 
-      // Dispatch actions if necessary (e.g., saving token)
-      // dispatch(login(data.token));
-      alert("Sign Up Successful");
+      dispatch(
+        setTokens({
+          accessToken: data.data.accessToken,
+          refreshToken: data.data.refreshToken,
+        })
+      );
+
+      dispatch(
+        setUser({
+          name: data.data.user.name,
+          email: data.data.user.email,
+          role: data.data.user.role,
+        })
+      );
+
+      toast.success("Sign Up Successful");
     } catch (err) {
+      toast.error("Sign Up Failed");
       console.error(err);
-      alert("Sign Up Failed");
     }
   };
 

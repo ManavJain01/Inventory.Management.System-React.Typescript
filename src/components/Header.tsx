@@ -115,8 +115,12 @@ const Header: React.FC = () => {
             </>
           )}
 
-          <Button color="inherit">Product</Button>
-          <Button color="inherit">Warehouse</Button>
+          <Link to="/products" color="inherit">
+            Product
+          </Link>
+          <Link to="/warehouse" color="inherit">
+            Warehouse
+          </Link>
 
           <Button variant="contained" onClick={toggleTheme}>
             {mode === "light" ? (

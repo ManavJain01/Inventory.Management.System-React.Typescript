@@ -10,9 +10,12 @@ import {
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "../store/store";
 
 const HomePage: React.FC = () => {
   const { t } = useTranslation();
+
+  const authdata = useAppSelector((store) => store.auth);
 
   return (
     <Box
@@ -109,9 +112,11 @@ const HomePage: React.FC = () => {
         </Grid>
       </Grid>
 
-      <Button variant="outlined" component={Link} to="/signup">
-        Get Started
-      </Button>
+      {!authdata.isAuthenticated && (
+        <Button variant="outlined" component={Link} to="/signup">
+          Get Started
+        </Button>
+      )}
     </Box>
   );
 };
