@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useAppDispatch } from "../store/store";
-import ForgotPassword from "../components/ForgotPassword";
+import ForgotPassword from "../components/Auth/ForgotPassword";
 
 const Login = () => {
   const [enableForgotPass, setEnableForgotPass] = useState(false);

@@ -3,7 +3,6 @@ import { Route, Routes } from "react-router-dom";
 
 // Importing Layouts
 import Basic from "./layouts/Basic";
-import Warehouse from "./layouts/Warehouse";
 
 // Importing Components
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -14,14 +13,14 @@ import { useAppSelector } from "./store/store";
 
 // Importing Pages
 import Home from "./pages/homepage";
+import Warehouse from "./pages/warehousepage";
 import LoadingPage from "./components/LoadingPage";
+import ResetPassword from "./components/Auth/ResetPassword";
 import SignUp from "./pages/signup";
 import Login from "./pages/loginpage";
 import NotFoundPage from "./pages/notfoundpage";
 const ProfilePage = React.lazy(() => import("./pages/profilepage"));
-const ShowWarehouse = React.lazy(
-  () => import("./pages/Warehouse/showWarehouse")
-);
+
 const ProductPage = React.lazy(() => import("./pages/productpage"));
 
 const App: React.FC = () => {
@@ -46,6 +45,7 @@ const App: React.FC = () => {
         <Route element={<PublicRoute isAuthenticated={isAuthenticated} />}>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
 
         {/* Private Routes */}
@@ -69,9 +69,7 @@ const App: React.FC = () => {
                 </Suspense>
               </ErrorBoundary>
             }
-          >
-            {/* <Route path="/" element={<ShowWarehouse />} /> */}
-          </Route>
+          />
           <Route
             path="/products"
             element={
