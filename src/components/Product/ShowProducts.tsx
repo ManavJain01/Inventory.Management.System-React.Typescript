@@ -3,7 +3,7 @@ import React from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from "@mui/material";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   quantity: number;
@@ -32,8 +32,8 @@ const ShowProducts: React.FC<ShowProductsProps> = ({ products, onEdit, onDelete 
           </TableRow>
         </TableHead>
         <TableBody>
-          {products.map((product) => (
-            <TableRow key={product.id}>
+          {products.map((product, index) => (
+            <TableRow key={index}>
               <TableCell>{product.name}</TableCell>
               <TableCell>{product.price}</TableCell>
               <TableCell>{product.quantity}</TableCell>

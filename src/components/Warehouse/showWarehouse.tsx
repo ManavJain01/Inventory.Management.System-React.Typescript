@@ -1,7 +1,7 @@
 import { Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 type Warehouse = {
-  id: string;
+  _id: string;
   name: string;
   location: string;
   managerId: string;
@@ -10,7 +10,7 @@ type Warehouse = {
 const ShowWarehouses: React.FC<{
   warehouses: Warehouse[];
   onEdit: (warehouse: Warehouse) => void;
-  onDelete: (id: string) => void;
+  onDelete: (_id: string) => void;
 }> = ({ warehouses, onEdit, onDelete }) => {
   return (
     <TableContainer component={Paper} sx={{ marginTop: 2 }}>
@@ -25,7 +25,7 @@ const ShowWarehouses: React.FC<{
         </TableHead>
         <TableBody>
           {warehouses.map((warehouse) => (
-            <TableRow key={warehouse.id}>
+            <TableRow key={warehouse._id}>
               <TableCell>{warehouse.name}</TableCell>
               <TableCell>{warehouse.location}</TableCell>
               <TableCell>{warehouse.managerId}</TableCell>
@@ -41,7 +41,7 @@ const ShowWarehouses: React.FC<{
                 <Button
                   variant="contained"
                   color="error"
-                  onClick={() => onDelete(warehouse.id)}
+                  onClick={() => onDelete(warehouse._id)}
                 >
                   Delete
                 </Button>

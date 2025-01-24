@@ -3,7 +3,7 @@ import React from "react";
 import { Typography, Button, Box } from "@mui/material";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   quantity: number;

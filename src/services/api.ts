@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store/store";
 import { logoutUser, resetTokens, setTokens } from "../store/reducers/authReducer";
 
-interface AuthResponse {
+interface UserResponse {
   data: {
     user: {
       _id: string;
@@ -17,6 +17,30 @@ interface AuthResponse {
   }
 }
 
+interface ProductResponse {
+  data: {
+    data: {
+      _id: string;
+      name: string;
+      price: number;
+      quantity: number;
+      lowStockThreshold: number;
+      warehouse_id: string;
+    };
+  }
+}
+
+interface WarehouseResponse {
+  data: {
+    data: {
+      _id: string;
+      name: string;
+      location: string;
+      managerId: string;
+    };
+  }
+}
+
 const baseQuery = fetchBaseQuery({
   baseUrl: "http://localhost:5000/api/",
   prepareHeaders: (headers, { getState, endpoint }) => {
@@ -25,7 +49,7 @@ const baseQuery = fetchBaseQuery({
     const token = state.auth.accessToken; // Get accessToken from your Redux state
     
     // List of public endpoints where no token is required
-    const publicEndpoints = ['signUp', 'login', 'forgotPassword']; // Add other public endpoints here
+    const publicEndpoints = ['signup', 'login', 'forgotPassword', 'reset-password' ]; // Add other public endpoints here
     if (!publicEndpoints.includes(endpoint) && token) {
       // Attach the token only for private endpoints
       headers.set("Authorization", `Bearer ${token}`);
@@ -92,14 +116,14 @@ export const api = createApi({
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     // Auth APIs
-    signUp: builder.mutation<AuthResponse, { name: string, email: string; password: string, role: string }>({
+    signUp: builder.mutation<UserResponse, { name: string, email: string; password: string, role: string }>({
       query: (data) => ({
-        url: 'users',
+        url: 'signup',
         method: 'POST',
         body: data,
       }),
     }),
-    login: builder.mutation<AuthResponse, { email: string; password: string }>({
+    login: builder.mutation<UserResponse, { email: string; password: string }>({
       query: (data) => ({
         url: 'login',
         method: 'POST',
@@ -113,8 +137,28 @@ export const api = createApi({
         body: data,
       })
     }),
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: 'reset-password',
+        method: 'POST',
+        body: data
+      })
+    }),
     // Users APIs
-    getUserById: builder.query<User, string>({
+    showUsers: builder.mutation<User, string>({
+      query: () => ({
+        url: `users/`,
+        method: 'GET',
+      }),
+    }),
+    createUser: builder.mutation<UserResponse, { name: string, email: string; password: string, role: string }>({
+      query: (data) => ({
+        url: 'users',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    getUserById: builder.mutation<User, string>({
       query: (id) => ({
         url: `users/${id}`,
         method: 'GET',
@@ -123,11 +167,116 @@ export const api = createApi({
     updateUser: builder.mutation({
       query: ({id, ...data}) => ({
         url: `users/${id}`,
+        method: 'PATCH',
+        body: data
+      }),
+    }),
+    editUser: builder.mutation({
+      query: ({id, ...data}) => ({
+        url: `users/${id}`,
         method: 'PUT',
+        body: data
+      }),
+    }),
+    deleteUser: builder.mutation({
+      query: ({id, ...data}) => ({
+        url: `users/${id}`,
+        method: 'DELETE',
+        body: data
+      }),
+    }),
+    // Products APIs
+    showProducts: builder.mutation({
+      query: () => ({
+        url: `inventory/`,
+        method: 'GET',
+      }),
+    }),
+    createProduct: builder.mutation<ProductResponse, [{ name: string, price: number, quantity: number, lowStockThreshold: number, warehouse_id: string }]>({
+      query: (data) => ({
+        url: 'inventory',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    getProductById: builder.mutation<ProductResponse, { name: string, price: number, quantity: number, lowStockThreshold: number, warehouse_id: string }>({
+      query: (id) => ({
+        url: `inventory/${id}`,
+        method: 'GET',
+      }),
+    }),
+    updateProduct: builder.mutation({
+      query: ({id, ...data}) => ({
+        url: `inventory/${id}`,
+        method: 'PATCH',
+        body: data
+      }),
+    }),
+    editProduct: builder.mutation({
+      query: ({id, ...data}) => ({
+        url: `inventory/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+    }),
+    deleteProduct: builder.mutation({
+      query: ({id, ...data}) => ({
+        url: `inventory/${id}`,
+        method: 'DELETE',
+        body: data
+      }),
+    }),
+    // Warehouse APIs
+    showWarehouses: builder.mutation({
+      query: () => ({
+        url: `warehouse/`,
+        method: 'GET',
+      }),
+    }),
+    createWarehouse: builder.mutation<WarehouseResponse, [{ name: string, location: string; managerId: string }]>({
+      query: (data) => ({
+        url: 'warehouse',
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    getWarehouseById: builder.mutation<User, string>({
+      query: (id) => ({
+        url: `warehouse/${id}`,
+        method: 'GET',
+      }),
+    }),
+    updateWarehouse: builder.mutation({
+      query: ({id, ...data}) => ({
+        url: `warehouse/${id}`,
+        method: 'PATCH',
+        body: data
+      }),
+    }),
+    editWarehouse: builder.mutation({
+      query: ({id, ...data}) => ({
+        url: `warehouse/${id}`,
+        method: 'PUT',
+        body: data
+      }),
+    }),
+    deleteWarehouse: builder.mutation({
+      query: ({id, ...data}) => ({
+        url: `warehouse/${id}`,
+        method: 'DELETE',
         body: data
       }),
     }),
   }),
 });
 
-export const { useSignUpMutation, useLoginMutation, useForgotPasswordMutation, useGetUserByIdQuery, useUpdateUserMutation } = api;
+export const { 
+  // Auth
+  useSignUpMutation, useLoginMutation, useForgotPasswordMutation, useResetPasswordMutation,
+  // Users
+  useShowUsersMutation, useCreateUserMutation, useGetUserByIdMutation, useEditUserMutation, useUpdateUserMutation, useDeleteUserMutation,
+  // Products
+  useShowProductsMutation, useCreateProductMutation, useGetProductByIdMutation, useEditProductMutation, useUpdateProductMutation, useDeleteProductMutation,
+  // Warehouses
+  useShowWarehousesMutation, useCreateWarehouseMutation, useGetWarehouseByIdMutation, useEditWarehouseMutation, useUpdateWarehouseMutation, useDeleteWarehouseMutation
+ } = api;

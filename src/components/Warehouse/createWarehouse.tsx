@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Modal, Typography, TextField } from '@mui/material';
 
 type Warehouse = {
-  id: string;
+  _id: string;
   name: string;
   location: string;
   managerId: string;
@@ -14,7 +14,7 @@ const CreateWarehouse: React.FC<{
   onSave: (warehouse: Warehouse) => void;
 }> = ({ warehouse, onClose, onSave }) => {
   const [formData, setFormData] = useState<Warehouse>(
-    warehouse || { id: '', name: '', location: '', managerId: '' }
+    warehouse || { _id: '', name: '', location: '', managerId: '' }
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

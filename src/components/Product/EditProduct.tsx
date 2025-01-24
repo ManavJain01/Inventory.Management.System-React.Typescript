@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { TextField, Button, Box } from "@mui/material";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   quantity: number;

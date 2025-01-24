@@ -1,7 +1,9 @@
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import ErrorBoundary from "../components/ErrorBoundary";
-import LoadingPage from "../components/LoadingPage";
+import { useShowProductsMutation } from "../services/api";
+import { toast } from "react-toastify";
+import LazyComponent from "../components/LazyComponent";
+
 const ShowProducts = React.lazy(
   () => import("../components/Product/ShowProducts")
 );
@@ -16,7 +18,7 @@ const DeleteProduct = React.lazy(
 );
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   quantity: number;
@@ -25,13 +27,36 @@ interface Product {
 }
 
 const ProductPage: React.FC = () => {
+  // Api Functions
+  const [ showProducts ] = useShowProductsMutation();
+  
+  // useStates
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
+  // useEffect
+  useEffect(() => {
+    handleAccessProducts();
+  }, []);
+
   // Handlers for dialog open/close
+  const handleAccessProducts = async () => {
+    try {
+      const response = await showProducts("");
+      if(!response || !response.data){
+        return;
+      }
+
+      const allProds = response.data.data as Product[];
+      setProducts(allProds);
+      
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
   const handleCreateOpen = () => setIsCreateOpen(true);
   const handleCreateClose = () => setIsCreateOpen(false);
 
@@ -60,30 +85,26 @@ const ProductPage: React.FC = () => {
         </Grid>
       </Grid>
 
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingPage />}>
+      <LazyComponent>
           <ShowProducts
             products={products}
             onEdit={handleEditOpen}
             onDelete={handleDeleteOpen}
           />
-        </Suspense>
-      </ErrorBoundary>
+        </LazyComponent>
 
       {/* Create Product Dialog */}
       <Dialog open={isCreateOpen} onClose={handleCreateClose} fullWidth maxWidth="sm">
         <DialogTitle>Create Product</DialogTitle>
         <DialogContent>
-          <ErrorBoundary>
-            <Suspense fallback={<LoadingPage />}>
+          <LazyComponent>
               <CreateProduct
                 onCreate={(newProduct) => {
                   setProducts([...products, newProduct]);
                   handleCreateClose();
                 }}
               />
-            </Suspense>
-          </ErrorBoundary>
+            </LazyComponent>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCreateClose}>Cancel</Button>
@@ -95,21 +116,19 @@ const ProductPage: React.FC = () => {
         <DialogTitle>Edit Product</DialogTitle>
         <DialogContent>
           {selectedProduct && (
-            <ErrorBoundary>
-              <Suspense fallback={<LoadingPage />}>
+            <LazyComponent>
                 <EditProduct
                   product={selectedProduct}
                   onEdit={(updatedProduct) => {
                     setProducts(
                       products.map((product) =>
-                        product.id === updatedProduct.id ? updatedProduct : product
+                        product._id === updatedProduct._id ? updatedProduct : product
                       )
                     );
                     handleEditClose();
                   }}
                 />
-              </Suspense>
-            </ErrorBoundary>
+              </LazyComponent>
           )}
         </DialogContent>
         <DialogActions>
@@ -122,17 +141,15 @@ const ProductPage: React.FC = () => {
         <DialogTitle>Delete Product</DialogTitle>
         <DialogContent>
           {selectedProduct && (
-            <ErrorBoundary>
-              <Suspense fallback={<LoadingPage />}>
+            <LazyComponent>
                 <DeleteProduct
                   product={selectedProduct}
                   onDelete={() => {
-                    setProducts(products.filter((product) => product.id !== selectedProduct.id));
+                    setProducts(products.filter((product) => product._id !== selectedProduct._id));
                     handleDeleteClose();
                   }}
                 />
-              </Suspense>
-            </ErrorBoundary>
+              </LazyComponent>
           )}
         </DialogContent>
         <DialogActions>

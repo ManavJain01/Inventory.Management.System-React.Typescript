@@ -1,7 +1,8 @@
-import React, { Suspense, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import LoadingPage from '../components/LoadingPage';
-import ErrorBoundary from '../components/ErrorBoundary';
+import LazyComponent from '../components/LazyComponent';
+import { useShowWarehousesMutation } from '../services/api';
+import { toast } from 'react-toastify';
 const CreateWarehouse = React.lazy(
   () => import("../components/Warehouse/createWarehouse")
 );
@@ -11,37 +12,62 @@ const ShowWarehouses = React.lazy(
 );
 
 type Warehouse = {
-  id: string;
+  _id: string;
   name: string;
   location: string;
   managerId: string;
 };
 
 const mockData: Warehouse[] = [
-  { id: '1', name: 'Warehouse A', location: 'New York', managerId: '101' },
-  { id: '2', name: 'Warehouse B', location: 'San Francisco', managerId: '102' },
+  { _id: '1', name: 'Warehouse A', location: 'New York', managerId: '101' },
+  { _id: '2', name: 'Warehouse B', location: 'San Francisco', managerId: '102' },
 ];
 
 const WarehousePage: React.FC = () => {
+  // Api Calls
+  const [showWarehouses] = useShowWarehousesMutation();
+
+  // useState
   const [warehouses, setWarehouses] = useState<Warehouse[]>(mockData);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentWarehouse, setCurrentWarehouse] = useState<Warehouse | null>(null);
 
+  // useEffect
+  useEffect(() => {
+    handleShowWarwhouses();
+  }, []);
+
+  // Functions
+  const handleShowWarwhouses = async () => {
+    try {
+      const response = await showWarehouses("");
+
+      if(!response || !response.data){
+        return;
+      }
+
+      const allWarehouses = response.data.data as Warehouse[];
+      setWarehouses(allWarehouses);      
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+
   const handleCreateWarehouse = (warehouse: Warehouse) => {
-    setWarehouses([...warehouses, { ...warehouse, id: String(Date.now()) }]);
+    setWarehouses([...warehouses, { ...warehouse, _id: String(Date.now()) }]);
     setModalOpen(false);
   };
 
   const handleEditWarehouse = (updatedWarehouse: Warehouse) => {
     setWarehouses(
-      warehouses.map((wh) => (wh.id === updatedWarehouse.id ? updatedWarehouse : wh))
+      warehouses.map((wh) => (wh._id === updatedWarehouse._id ? updatedWarehouse : wh))
     );
     setCurrentWarehouse(null);
     setModalOpen(false);
   };
 
   const handleDeleteWarehouse = (id: string) => {
-    setWarehouses(warehouses.filter((warehouse) => warehouse.id !== id));
+    setWarehouses(warehouses.filter((warehouse) => warehouse._id !== id));
   };
 
   return (
@@ -60,8 +86,7 @@ const WarehousePage: React.FC = () => {
         Create Warehouse
       </Button>
 
-      <ErrorBoundary>
-        <Suspense fallback={<LoadingPage />}>
+      <LazyComponent>
           <ShowWarehouses
             warehouses={warehouses}
             onEdit={(warehouse) => {
@@ -70,19 +95,16 @@ const WarehousePage: React.FC = () => {
             }}
             onDelete={handleDeleteWarehouse}
           />
-        </Suspense>
-      </ErrorBoundary>
+        </LazyComponent>
 
       {modalOpen && (
-        <ErrorBoundary>
-        <Suspense fallback={<LoadingPage />}>
+        <LazyComponent>
           <CreateWarehouse
             warehouse={currentWarehouse}
             onClose={() => setModalOpen(false)}
             onSave={currentWarehouse ? handleEditWarehouse : handleCreateWarehouse}
           />
-        </Suspense>
-      </ErrorBoundary>
+        </LazyComponent>
       )}
     </Box>
   );

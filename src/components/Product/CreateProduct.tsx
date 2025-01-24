@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { TextField, Button, Box } from "@mui/material";
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   quantity: number;
@@ -16,7 +16,7 @@ interface CreateProductProps {
 }
 
 const CreateProduct: React.FC<CreateProductProps> = ({ onCreate }) => {
-  const [product, setProduct] = useState<Omit<Product, "id">>({
+  const [product, setProduct] = useState<Omit<Product, "_id">>({
     name: "",
     price: 0,
     quantity: 0,
@@ -29,7 +29,7 @@ const CreateProduct: React.FC<CreateProductProps> = ({ onCreate }) => {
   };
 
   const handleSubmit = () => {
-    const newProduct = { ...product, id: Date.now().toString() };
+    const newProduct = { ...product, _id: Date.now().toString() };
     onCreate(newProduct);
   };
 

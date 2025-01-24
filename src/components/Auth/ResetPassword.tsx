@@ -3,14 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 import axios from 'axios';
+import { useResetPasswordMutation } from '../../services/api';
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [ resetPassword, { isLoading } ] = useResetPasswordMutation();
 
   // Extract the token from the query params
   const queryParams = new URLSearchParams(location.search);
@@ -42,14 +43,10 @@ const ResetPassword = () => {
     }
 
     try {
-      setLoading(true);
       setError(null);
 
-      const response = await axios.post(
-        '/api/reset-password', // Replace with your API endpoint
-        { token, newPassword }
-      );
-
+      const response = await resetPassword({ token: token, password: newPassword });
+      
       if (response.data.success) {
         navigate('/login'); // Redirect to login page on success
       } else {
@@ -57,8 +54,6 @@ const ResetPassword = () => {
       }
     } catch (error) {
       setError('An error occurred while resetting the password');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -105,9 +100,9 @@ const ResetPassword = () => {
             color="primary"
             fullWidth
             sx={{ marginTop: 2 }}
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading ? 'Resetting...' : 'Reset Password'}
+            {isLoading ? 'Resetting...' : 'Reset Password'}
           </Button>
         </form>
       </Box>
