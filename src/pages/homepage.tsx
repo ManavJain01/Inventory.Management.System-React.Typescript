@@ -30,10 +30,6 @@ const HomePage: React.FC = () => {
         p: 3,
       }}
     >
-      <Button color="primary" variant="contained">
-        Primary Button
-      </Button>
-
       <Typography variant="h3" component="h1" gutterBottom>
         {t("home page.welcome")}
       </Typography>
@@ -56,7 +52,7 @@ const HomePage: React.FC = () => {
               <Button
                 size="small"
                 component={Link}
-                to="/users"
+                to="/all-users"
                 variant="contained"
               >
                 Go to Users
@@ -102,7 +98,7 @@ const HomePage: React.FC = () => {
               <Button
                 size="small"
                 component={Link}
-                to="/warehouses"
+                to="/warehouse"
                 variant="contained"
               >
                 Go to Warehouses

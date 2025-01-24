@@ -145,7 +145,7 @@ export const api = createApi({
       })
     }),
     // Users APIs
-    showUsers: builder.mutation<User, string>({
+    showUsers: builder.mutation({
       query: () => ({
         url: `users/`,
         method: 'GET',

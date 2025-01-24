@@ -12,7 +12,7 @@ const RoleAuthRoute: React.FC<RoleAuthProps> = ({
   isAuthenticated,
   userRoles,
   allowedRoles,
-  redirectPath = "/unauthorized", // Default redirect path for unauthorized users
+  redirectPath = "/", // Default redirect path for unauthorized users
 }) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

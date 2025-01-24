@@ -1,11 +1,10 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 
 // Importing Layouts
 import Basic from "./layouts/Basic";
 
 // Importing Components
-import ErrorBoundary from "./components/ErrorBoundary";
 import PrivateRoute from "./components/Auth/PrivateRoute";
 import PublicRoute from "./components/Auth/PublicRoute";
 import RoleAuthRoute from "./components/Auth/RoleAuthRoute";
@@ -13,12 +12,13 @@ import { useAppSelector } from "./store/store";
 
 // Importing Pages
 import Home from "./pages/homepage";
+import AllUsersPage from "./pages/alluserspage";
 import Warehouse from "./pages/warehousepage";
-import LoadingPage from "./components/LoadingPage";
 import ResetPassword from "./components/Auth/ResetPassword";
 import SignUp from "./pages/signup";
 import Login from "./pages/loginpage";
 import NotFoundPage from "./pages/notfoundpage";
+import LazyComponent from "./components/LazyComponent";
 const ProfilePage = React.lazy(() => import("./pages/profilepage"));
 
 const ProductPage = React.lazy(() => import("./pages/productpage"));
@@ -53,31 +53,36 @@ const App: React.FC = () => {
           <Route
             path="/profile"
             element={
-              <ErrorBoundary>
-                <Suspense fallback={<LoadingPage />}>
+              <LazyComponent>
                   <ProfilePage />
-                </Suspense>
-              </ErrorBoundary>
+                </LazyComponent>
             }
           />
           <Route
+            path="/all-users"
+            element={
+              <RoleAuthRoute isAuthenticated={isAuthenticated} userRoles={["ADMIN", "USER", "MANAGER"]} allowedRoles={["ADMIN"]} />
+            }
+          >
+            <Route path="" element={
+              <LazyComponent>
+                <AllUsersPage />
+              </LazyComponent>} />
+          </Route>
+          <Route
             path="/warehouse"
             element={
-              <ErrorBoundary>
-                <Suspense fallback={<LoadingPage />}>
+              <LazyComponent>
                   <Warehouse />
-                </Suspense>
-              </ErrorBoundary>
+                </LazyComponent>
             }
           />
           <Route
             path="/products"
             element={
-              <ErrorBoundary>
-                <Suspense fallback={<LoadingPage />}>
+              <LazyComponent>
                   <ProductPage />
-                </Suspense>
-              </ErrorBoundary>
+                </LazyComponent>
             }
           />
         </Route>
