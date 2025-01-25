@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Button, Typography } from '@mui/material';
-import LazyComponent from '../components/LazyComponent';
-import { useShowWarehousesMutation } from '../services/api';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from "react";
+import { Box, Button, Typography } from "@mui/material";
+import LazyComponent from "../components/LazyComponent";
+import { useShowWarehousesMutation } from "../services/warehouse.api";
+import { toast } from "react-toastify";
 const CreateWarehouse = React.lazy(
   () => import("../components/Warehouse/createWarehouse")
 );
@@ -19,8 +19,13 @@ type Warehouse = {
 };
 
 const mockData: Warehouse[] = [
-  { _id: '1', name: 'Warehouse A', location: 'New York', managerId: '101' },
-  { _id: '2', name: 'Warehouse B', location: 'San Francisco', managerId: '102' },
+  { _id: "1", name: "Warehouse A", location: "New York", managerId: "101" },
+  {
+    _id: "2",
+    name: "Warehouse B",
+    location: "San Francisco",
+    managerId: "102",
+  },
 ];
 
 const WarehousePage: React.FC = () => {
@@ -30,7 +35,9 @@ const WarehousePage: React.FC = () => {
   // useState
   const [warehouses, setWarehouses] = useState<Warehouse[]>(mockData);
   const [modalOpen, setModalOpen] = useState(false);
-  const [currentWarehouse, setCurrentWarehouse] = useState<Warehouse | null>(null);
+  const [currentWarehouse, setCurrentWarehouse] = useState<Warehouse | null>(
+    null
+  );
 
   // useEffect
   useEffect(() => {
@@ -42,12 +49,12 @@ const WarehousePage: React.FC = () => {
     try {
       const response = await showWarehouses("");
 
-      if(!response || !response.data){
+      if (!response || !response.data) {
         return;
       }
 
       const allWarehouses = response.data.data as Warehouse[];
-      setWarehouses(allWarehouses);      
+      setWarehouses(allWarehouses);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -60,7 +67,9 @@ const WarehousePage: React.FC = () => {
 
   const handleEditWarehouse = (updatedWarehouse: Warehouse) => {
     setWarehouses(
-      warehouses.map((wh) => (wh._id === updatedWarehouse._id ? updatedWarehouse : wh))
+      warehouses.map((wh) =>
+        wh._id === updatedWarehouse._id ? updatedWarehouse : wh
+      )
     );
     setCurrentWarehouse(null);
     setModalOpen(false);
@@ -87,22 +96,24 @@ const WarehousePage: React.FC = () => {
       </Button>
 
       <LazyComponent>
-          <ShowWarehouses
-            warehouses={warehouses}
-            onEdit={(warehouse) => {
-              setCurrentWarehouse(warehouse);
-              setModalOpen(true);
-            }}
-            onDelete={handleDeleteWarehouse}
-          />
-        </LazyComponent>
+        <ShowWarehouses
+          warehouses={warehouses}
+          onEdit={(warehouse) => {
+            setCurrentWarehouse(warehouse);
+            setModalOpen(true);
+          }}
+          onDelete={handleDeleteWarehouse}
+        />
+      </LazyComponent>
 
       {modalOpen && (
         <LazyComponent>
           <CreateWarehouse
             warehouse={currentWarehouse}
             onClose={() => setModalOpen(false)}
-            onSave={currentWarehouse ? handleEditWarehouse : handleCreateWarehouse}
+            onSave={
+              currentWarehouse ? handleEditWarehouse : handleCreateWarehouse
+            }
           />
         </LazyComponent>
       )}

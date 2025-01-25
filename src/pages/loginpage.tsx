@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLoginMutation } from "../services/api";
+import { useLoginMutation } from "../services/auth.api";
 import { setTokens, setUser } from "../store/reducers/authReducer";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

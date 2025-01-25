@@ -1,43 +1,53 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton } from '@mui/material';
-import { Edit, Delete } from '@mui/icons-material';
-import { useShowUsersMutation } from '../services/api';
-import UserDialog from '../components/AllUsers/UserDialog';
+import React, { useEffect, useState } from "react";
+import {
+  Button,
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import { useShowUsersMutation } from "../services/user.api";
+import UserDialog from "../components/AllUsers/UserDialog";
 // import { getUsers, deleteUser } from '../api/users';
 
 const AllUsersPage: React.FC = () => {
   const [showAllUsers] = useShowUsersMutation();
-  
+
   const [users, setUsers] = useState<any[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
 
-
   useEffect(() => {
     fetchUsers();
   }, []);
-  
+
   const fetchUsers = async () => {
     try {
       const response = await showAllUsers("");
 
-      if(!response || !response.data){
+      if (!response || !response.data) {
         return;
       }
 
       const allUsers = response.data.data as [Object];
       setUsers(allUsers);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error("Error fetching users:", error);
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       // await deleteUser(id);
-      setUsers(users.filter(user => user._id !== id));
+      setUsers(users.filter((user) => user._id !== id));
     } catch (error) {
-      console.error('Error deleting user:', error);
+      console.error("Error deleting user:", error);
     }
   };
 
@@ -57,7 +67,7 @@ const AllUsersPage: React.FC = () => {
 
   const handleSaveUser = () => {
     setOpenDialog(false);
-    setUsers(prevUsers => [...prevUsers]); // Fetch or update the user list
+    setUsers((prevUsers) => [...prevUsers]); // Fetch or update the user list
   };
 
   return (
@@ -94,7 +104,12 @@ const AllUsersPage: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <UserDialog open={openDialog} onClose={handleDialogClose} user={selectedUser} onSave={handleSaveUser} />
+      <UserDialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        user={selectedUser}
+        onSave={handleSaveUser}
+      />
     </Container>
   );
 };

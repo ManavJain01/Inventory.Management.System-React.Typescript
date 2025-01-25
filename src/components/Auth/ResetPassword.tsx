@@ -1,25 +1,24 @@
 // ResetPassword.tsx
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { TextField, Button, Container, Typography, Box } from '@mui/material';
-import axios from 'axios';
-import { useResetPasswordMutation } from '../../services/api';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import { useResetPasswordMutation } from "../../services/auth.api";
 
 const ResetPassword = () => {
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const [ resetPassword, { isLoading } ] = useResetPasswordMutation();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
   // Extract the token from the query params
   const queryParams = new URLSearchParams(location.search);
-  const token = queryParams.get('token');
+  const token = queryParams.get("token");
 
   useEffect(() => {
     if (!token) {
-      setError('Invalid or missing token');
+      setError("Invalid or missing token");
     }
   }, [token]);
 
@@ -28,32 +27,35 @@ const ResetPassword = () => {
     event.preventDefault();
 
     if (!newPassword || !confirmPassword) {
-      setError('Both fields are required');
+      setError("Both fields are required");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
 
     if (!token) {
-      setError('Token is missing');
+      setError("Token is missing");
       return;
     }
 
     try {
       setError(null);
 
-      const response = await resetPassword({ token: token, password: newPassword });
-      
+      const response = await resetPassword({
+        token: token,
+        password: newPassword,
+      });
+
       if (response.data.success) {
-        navigate('/login'); // Redirect to login page on success
+        navigate("/login"); // Redirect to login page on success
       } else {
-        setError('Password reset failed');
+        setError("Password reset failed");
       }
     } catch (error) {
-      setError('An error occurred while resetting the password');
+      setError("An error occurred while resetting the password");
     }
   };
 
@@ -61,9 +63,9 @@ const ResetPassword = () => {
     <Container component="main" maxWidth="xs">
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           marginTop: 8,
         }}
       >
@@ -73,7 +75,7 @@ const ResetPassword = () => {
             {error}
           </Typography>
         )}
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+        <form onSubmit={handleSubmit} style={{ width: "100%" }}>
           <TextField
             label="New Password"
             variant="outlined"
@@ -102,7 +104,7 @@ const ResetPassword = () => {
             sx={{ marginTop: 2 }}
             disabled={isLoading}
           >
-            {isLoading ? 'Resetting...' : 'Reset Password'}
+            {isLoading ? "Resetting..." : "Reset Password"}
           </Button>
         </form>
       </Box>

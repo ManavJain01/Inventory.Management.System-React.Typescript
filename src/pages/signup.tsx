@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSignUpMutation } from "../services/api";
+import { useSignUpMutation } from "../services/auth.api";
 import { setTokens, setUser } from "../store/reducers/authReducer";
 import {
   Box,
@@ -38,6 +38,7 @@ const SignUp = () => {
 
       dispatch(
         setUser({
+          id: data.data.user._id,
           name: data.data.user.name,
           email: data.data.user.email,
           role: data.data.user.role,

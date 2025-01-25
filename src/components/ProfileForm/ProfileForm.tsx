@@ -14,7 +14,7 @@ import {
 import axios from "axios";
 import styles from "./ProfileForm.module.css";
 import { useAppSelector } from "../../store/store";
-import { useUpdateUserMutation } from "../../services/api";
+import { useUpdateUserMutation } from "../../services/user.api";
 
 interface FormData {
   name: string;
