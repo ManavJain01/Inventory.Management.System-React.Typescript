@@ -8,7 +8,7 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { useShowProductsMutation } from "../services/product.api";
+import { useDeleteProductMutation, useShowProductsMutation } from "../services/product.api";
 import { toast } from "react-toastify";
 import LazyComponent from "../components/LazyComponent";
 
@@ -35,6 +35,7 @@ interface Product {
 const ProductPage: React.FC = () => {
   // Api Functions
   const [showProducts] = useShowProductsMutation();
+  const [deleteProduct] = useDeleteProductMutation();
 
   // useStates
   const [products, setProducts] = useState<Product[]>([]);
@@ -76,6 +77,19 @@ const ProductPage: React.FC = () => {
     setIsDeleteOpen(true);
   };
   const handleDeleteClose = () => setIsDeleteOpen(false);
+
+  const handleDeleteProduct = async () => {
+    if(!selectedProduct) return;
+    
+    await deleteProduct(selectedProduct._id);
+
+    setProducts(
+      products.filter(
+        (product) => product._id !== selectedProduct._id
+      )
+    );
+    handleDeleteClose();
+  };
 
   return (
     <Box p={3}>
@@ -175,14 +189,7 @@ const ProductPage: React.FC = () => {
             <LazyComponent>
               <DeleteProduct
                 product={selectedProduct}
-                onDelete={() => {
-                  setProducts(
-                    products.filter(
-                      (product) => product._id !== selectedProduct._id
-                    )
-                  );
-                  handleDeleteClose();
-                }}
+                onDelete={handleDeleteProduct}
               />
             </LazyComponent>
           )}

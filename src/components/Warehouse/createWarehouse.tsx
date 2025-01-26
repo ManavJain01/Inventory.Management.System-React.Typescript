@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Box, Button, Modal, Typography, TextField } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Modal, Typography, TextField, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
+import { useShowManagersMutation } from '../../services/user.api';
 
 type Warehouse = {
   _id: string;
@@ -8,18 +9,44 @@ type Warehouse = {
   managerId: string;
 };
 
+type Manager = {
+  _id: string;
+  name: string;
+};
+
 const CreateWarehouse: React.FC<{
   warehouse: Warehouse | null;
   onClose: () => void;
   onSave: (warehouse: Warehouse) => void;
 }> = ({ warehouse, onClose, onSave }) => {
+  // Api Calls
+  const [showManagers] = useShowManagersMutation();
+
+  // useState
   const [formData, setFormData] = useState<Warehouse>(
     warehouse || { _id: '', name: '', location: '', managerId: '' }
   );
+  const [managers, setManagers] = useState<Manager[]>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // useEffect
+  useEffect(() => {
+    handleManagers();
+  }, []);
+
+  // Functions
+  const handleManagers = async () => {
+    const res = await showManagers("");
+    
+    setManagers(res.data.data);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleManagerChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    setFormData((prev) => ({ ...prev, managerId: e.target.value as string }));
   };
 
   const handleSubmit = () => {
@@ -62,14 +89,21 @@ const CreateWarehouse: React.FC<{
           fullWidth
           margin="normal"
         />
-        <TextField
-          label="Manager ID"
-          name="managerId"
-          value={formData.managerId}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="manager-select-label">Manager</InputLabel>
+          <Select
+            labelId="manager-select-label"
+            value={formData.managerId}
+            onChange={handleManagerChange}
+            name="managerId"
+          >
+            {Array.isArray(managers) && managers?.map((manager, index) => (
+              <MenuItem key={index} value={manager._id}>
+                {manager.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
           <Button onClick={onClose} sx={{ marginRight: 1 }}>
             Cancel

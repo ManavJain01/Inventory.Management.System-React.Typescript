@@ -12,7 +12,7 @@ export const apiUser = createApi({
         method: 'GET',
       }),
     }),
-    createUser: builder.mutation<UserResponse, { name: string, email: string; password: string, role: string }>({
+    createUser: builder.mutation({
       query: (data) => ({
         url: 'users',
         method: 'POST',
@@ -28,28 +28,34 @@ export const apiUser = createApi({
     updateUser: builder.mutation({
       query: ({id, ...data}) => ({
         url: `users/${id}`,
-        method: 'PATCH',
+        method: 'PUT',
         body: data
       }),
     }),
     editUser: builder.mutation({
       query: ({id, ...data}) => ({
         url: `users/${id}`,
-        method: 'PUT',
+        method: 'PATCH',
         body: data
       }),
     }),
     deleteUser: builder.mutation({
-      query: ({id, ...data}) => ({
+      query: (id) => ({
         url: `users/${id}`,
-        method: 'DELETE',
-        body: data
+        method: 'DELETE'
       }),
-    })
+    }),
+    showManagers: builder.mutation({
+      query: () => ({
+        url: `users/managers`,
+        method: 'GET',
+      }),
+    }),
   }),
 });
 
 export const { 
   // Users
   useShowUsersMutation, useCreateUserMutation, useGetUserByIdMutation, useEditUserMutation, useUpdateUserMutation, useDeleteUserMutation,
+  useShowManagersMutation,
  } = apiUser;

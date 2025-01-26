@@ -12,12 +12,16 @@ import {
   IconButton,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import { useShowUsersMutation } from "../services/user.api";
+import { useCreateUserMutation, useDeleteUserMutation, useShowUsersMutation, useUpdateUserMutation } from "../services/user.api";
 import UserDialog from "../components/AllUsers/UserDialog";
 // import { getUsers, deleteUser } from '../api/users';
 
 const AllUsersPage: React.FC = () => {
+  // Api Calls
   const [showAllUsers] = useShowUsersMutation();
+  const [createUser] = useCreateUserMutation();
+  const [updateUser] = useUpdateUserMutation();
+  const [deleteUser] = useDeleteUserMutation();
 
   const [users, setUsers] = useState<any[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
@@ -44,8 +48,8 @@ const AllUsersPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      // await deleteUser(id);
-      setUsers(users.filter((user) => user._id !== id));
+      await deleteUser(id);
+      await fetchUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -56,16 +60,23 @@ const AllUsersPage: React.FC = () => {
     setOpenDialog(true);
   };
 
-  const handleAddUser = () => {
+  const handleAddUser = async () => {
     setSelectedUser(null);
     setOpenDialog(true);
+  };
+
+  const handleCreateUser = async (user) => {
+    await createUser({name: user.name, email: user.email, password: user.password, role: user.role});
+    await fetchUsers();
+    setOpenDialog(false);
   };
 
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
 
-  const handleSaveUser = () => {
+  const handleSaveUser = async (user) => {    
+    await updateUser({id: user._id, name: user.name, email: user.email, role: user.role});
     setOpenDialog(false);
     setUsers((prevUsers) => [...prevUsers]); // Fetch or update the user list
   };
@@ -108,7 +119,7 @@ const AllUsersPage: React.FC = () => {
         open={openDialog}
         onClose={handleDialogClose}
         user={selectedUser}
-        onSave={handleSaveUser}
+        onSave={selectedUser ? handleSaveUser : handleCreateUser}
       />
     </Container>
   );

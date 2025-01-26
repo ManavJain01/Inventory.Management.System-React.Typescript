@@ -1,6 +1,11 @@
-// CreateProduct.tsx
-import React, { useState } from "react";
-import { TextField, Button, Box } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { TextField, Button, Box, MenuItem, Select, InputLabel, FormControl } from "@mui/material";
+import { useShowWarehousesMutation } from "../../services/warehouse.api";
+
+interface Warehouse {
+  _id: string;
+  name: string;
+}
 
 interface Product {
   _id: string;
@@ -16,6 +21,10 @@ interface CreateProductProps {
 }
 
 const CreateProduct: React.FC<CreateProductProps> = ({ onCreate }) => {
+  // Api Calls
+  const [showWarehouses] = useShowWarehousesMutation();
+  // useState
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [product, setProduct] = useState<Omit<Product, "_id">>({
     name: "",
     price: 0,
@@ -24,13 +33,29 @@ const CreateProduct: React.FC<CreateProductProps> = ({ onCreate }) => {
     lowStockThreshold: 0,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
+  // useEffect
+  useEffect(() => {
+    handleShowWarehouses();
+  }, []);
+
+  // Functions
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+    const { name, value } = e.target;
+    if (name) {
+      setProduct({ ...product, [name]: value });
+    }
   };
 
   const handleSubmit = () => {
     const newProduct = { ...product, _id: Date.now().toString() };
     onCreate(newProduct);
+  };
+
+  const handleShowWarehouses = async () => {
+    const res = await showWarehouses("");
+    if (res.data?.data) {
+      setWarehouses(res.data.data);
+    }
   };
 
   return (
@@ -61,14 +86,21 @@ const CreateProduct: React.FC<CreateProductProps> = ({ onCreate }) => {
         fullWidth
         margin="normal"
       />
-      <TextField
-        label="Warehouse ID"
-        name="warehouseId"
-        value={product.warehouseId}
-        onChange={handleChange}
-        fullWidth
-        margin="normal"
-      />
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="warehouse-label">Warehouse</InputLabel>
+        <Select
+          labelId="warehouse-label"
+          name="warehouseId"
+          value={product.warehouseId}
+          onChange={handleChange}
+        >
+          {warehouses.map((warehouse) => (
+            <MenuItem key={warehouse._id} value={warehouse._id}>
+              {warehouse.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <TextField
         label="Low Stock Threshold"
         name="lowStockThreshold"

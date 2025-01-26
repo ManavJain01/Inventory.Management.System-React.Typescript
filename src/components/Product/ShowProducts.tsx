@@ -36,7 +36,6 @@ interface ShowProductsProps {
 
 const ShowProducts: React.FC<ShowProductsProps> = ({ products, onEdit, onDelete }) => {
   const [openRows, setOpenRows] = useState<Record<string, boolean>>({});
-console.log("products:", products);
 
   const toggleRow = (id: string) => {
     setOpenRows((prev) => ({ ...prev, [id]: !prev[id] }));

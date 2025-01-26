@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import LazyComponent from "../components/LazyComponent";
-import { useShowWarehousesMutation } from "../services/warehouse.api";
+import { useShowWarehousesMutation, useCreateWarehouseMutation, useUpdateWarehouseMutation, useDeleteWarehouseMutation } from "../services/warehouse.api";
 import { toast } from "react-toastify";
 const CreateWarehouse = React.lazy(
   () => import("../components/Warehouse/createWarehouse")
@@ -31,6 +31,9 @@ const mockData: Warehouse[] = [
 const WarehousePage: React.FC = () => {
   // Api Calls
   const [showWarehouses] = useShowWarehousesMutation();
+  const [createWarehouse] = useCreateWarehouseMutation();
+  const [updateWarehouse] = useUpdateWarehouseMutation();
+  const [deleteWarehouse] = useDeleteWarehouseMutation();
 
   // useState
   const [warehouses, setWarehouses] = useState<Warehouse[]>(mockData);
@@ -60,23 +63,23 @@ const WarehousePage: React.FC = () => {
     }
   };
 
-  const handleCreateWarehouse = (warehouse: Warehouse) => {
-    setWarehouses([...warehouses, { ...warehouse, _id: String(Date.now()) }]);
+  const handleCreateWarehouse = async (warehouse: Warehouse) => {
+    await createWarehouse({name: warehouse.name, location: warehouse.location, managerId: warehouse.managerId});
+    await handleShowWarwhouses();
     setModalOpen(false);
   };
 
-  const handleEditWarehouse = (updatedWarehouse: Warehouse) => {
-    setWarehouses(
-      warehouses.map((wh) =>
-        wh._id === updatedWarehouse._id ? updatedWarehouse : wh
-      )
-    );
+  const handleEditWarehouse = async (updatedWarehouse: Warehouse) => {
+    await updateWarehouse({id: updatedWarehouse._id, name: updatedWarehouse.name, location: updatedWarehouse.location, managerId: updatedWarehouse.managerId});
+    await handleShowWarwhouses();
+
     setCurrentWarehouse(null);
     setModalOpen(false);
   };
 
-  const handleDeleteWarehouse = (id: string) => {
-    setWarehouses(warehouses.filter((warehouse) => warehouse._id !== id));
+  const handleDeleteWarehouse = async (id: string) => {
+    await deleteWarehouse(id);
+    await handleShowWarwhouses();
   };
 
   return (

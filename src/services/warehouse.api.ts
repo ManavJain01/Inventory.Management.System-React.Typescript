@@ -12,7 +12,7 @@ export const apiWarehouse = createApi({
         method: 'GET',
       }),
     }),
-    createWarehouse: builder.mutation<WarehouseResponse, [{ name: string, location: string; managerId: string }]>({
+    createWarehouse: builder.mutation({
       query: (data) => ({
         url: 'warehouse',
         method: 'POST',
@@ -28,22 +28,21 @@ export const apiWarehouse = createApi({
     updateWarehouse: builder.mutation({
       query: ({id, ...data}) => ({
         url: `warehouse/${id}`,
-        method: 'PATCH',
+        method: 'PUT',
         body: data
       }),
     }),
     editWarehouse: builder.mutation({
       query: ({id, ...data}) => ({
         url: `warehouse/${id}`,
-        method: 'PUT',
+        method: 'PATCH',
         body: data
       }),
     }),
     deleteWarehouse: builder.mutation({
-      query: ({id, ...data}) => ({
+      query: (id) => ({
         url: `warehouse/${id}`,
-        method: 'DELETE',
-        body: data
+        method: 'DELETE'
       }),
     }),
   }),
