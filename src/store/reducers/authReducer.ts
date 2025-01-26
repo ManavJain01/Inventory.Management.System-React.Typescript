@@ -20,7 +20,7 @@ const initialState: AuthState = {
   email: localStorage.getItem("email") || "",
   role: localStorage.getItem("role") || "",
   accessToken: localStorage.getItem("accessToken") || "",
-  refreshToken: localStorage.getItem("accessToken") || "",
+  refreshToken: localStorage.getItem("refreshToken") || "",
   isAuthenticated: localStorage.getItem("accessToken") ? true : false,
 };
 
@@ -49,6 +49,7 @@ export const authSlice = createSlice({
       state.name = "";
       state.email = "";
       state.role = "";
+      localStorage.removeItem("id");
       localStorage.removeItem("name");
       localStorage.removeItem("email");
       localStorage.removeItem("role");

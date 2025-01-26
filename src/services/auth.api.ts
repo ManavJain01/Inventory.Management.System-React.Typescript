@@ -1,9 +1,9 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQuery, UserResponse } from "./api";
+import { publicBaseQuery, UserResponse } from "./api";
 
 export const apiAuth = createApi({
   reducerPath: "apiAuth",
-  baseQuery: baseQuery,
+  baseQuery: publicBaseQuery,
   endpoints: (builder) => ({
     // Auth APIs
     signUp: builder.mutation<UserResponse, { name: string, email: string; password: string, role: string }>({

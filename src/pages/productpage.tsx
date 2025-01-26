@@ -29,9 +29,7 @@ interface Product {
   _id: string;
   name: string;
   price: number;
-  quantity: number;
-  warehouseId: string;
-  lowStockThreshold: number;
+  warehouses: []
 }
 
 const ProductPage: React.FC = () => {
@@ -67,7 +65,7 @@ const ProductPage: React.FC = () => {
   const handleCreateOpen = () => setIsCreateOpen(true);
   const handleCreateClose = () => setIsCreateOpen(false);
 
-  const handleEditOpen = (product: Product) => {
+  const handleEditOpen = (product: Product, index: number) => {
     setSelectedProduct(product);
     setIsEditOpen(true);
   };
