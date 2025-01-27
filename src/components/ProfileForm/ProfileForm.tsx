@@ -1,133 +1,99 @@
-import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form"; // No need to import setValue explicitly
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import {
   TextField,
   Button,
   Box,
-  Typography,
   FormControl,
   Select,
   MenuItem,
   FormHelperText,
-  Stack,
 } from "@mui/material";
-import axios from "axios";
-import styles from "./ProfileForm.module.css";
 import { useAppSelector } from "../../store/store";
 import { useUpdateUserMutation } from "../../services/user.api";
+import { motion } from "framer-motion";
 
-interface FormData {
+interface ProfileData {
   name: string;
   email: string;
   role: string;
 }
 
-const ProfileForm: React.FC = () => {
-  // uaseSelector
+interface ProfileFormProps {
+  profile: ProfileData;
+  setProfile: React.Dispatch<React.SetStateAction<ProfileData>>;
+}
+
+const ProfileForm: React.FC<ProfileFormProps> = ({ profile, setProfile }) => {
   const authData = useAppSelector((store) => store.auth);
-
-  const [updateProfile, { isLoading }] = useUpdateUserMutation();
-
-  // useState
-  const [profile, setProfile] = useState<FormData>({
-    name: "",
-    email: "",
-    role: "",
-  });
+  const [updateProfile] = useUpdateUserMutation();
   const [isEditing, setIsEditing] = useState(false);
-
-  // useEffect
-  useEffect(() => {
-    if (authData.name || authData.email || authData.role) {
-      setProfile({
-        name: authData.name,
-        email: authData.email,
-        role: authData.role,
-      });
-    }
-    // fetchProfile(); // Fetch profile data when component mounts
-  }, []);
 
   const {
     register,
     reset,
     formState: { errors },
-    setValue, // Accessing setValue from useForm
-  } = useForm<FormData>();
+  } = useForm<ProfileData>({
+    defaultValues: profile, // Initialize with profile data
+  });
 
-  // Fetch the profile data from the backend (Mock API)
-  const fetchProfile = async () => {
-    try {
-      const response = await axios.get("/api/profile"); // Mock endpoint
-      setProfile(response.data);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
-    }
-  };
-
-  // Create or Update the profile
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await updateProfile({ id: authData.id, data: profile });
-      console.log("data: ", data);
-
+      await updateProfile({ id: authData.id, data: profile });
       setIsEditing(false);
     } catch (error) {
       console.error("Error submitting profile:", error);
     }
   };
 
-  // Delete the profile
-  const handleDelete = async () => {
-    try {
-      await axios.delete("/api/profile"); // Mock API endpoint for deleting
-      setProfile({ name: "", email: "", role: "" }); // Clear profile state
-      reset(); // Reset form
-    } catch (error) {
-      console.error("Error deleting profile:", error);
-    }
+  const handleCancel = () => {
+    reset(profile); // Reset form to original profile data
+    setIsEditing(false);
   };
 
-  // Handle editing the profile
   const handleEdit = () => {
-    if (profile) {
-      reset(profile); // Pre-fill form with existing profile data
-      setIsEditing(true);
-    }
+    reset(profile); // Pre-fill form with existing profile data
+    setIsEditing(true);
   };
 
-  if (!profile)
-    return (
-      <Stack direction="column" gap="20px">
-        <Typography variant="h4" className={styles.title}>
-          Profile
-        </Typography>
-
-        <Typography variant="h6">
-          No profile found. Create a new one.
-        </Typography>
-      </Stack>
-    );
-  else
-    return (
-      <Box className={styles.formContainer}>
-        <Typography variant="h4" className={styles.title}>
-          Edit Profile
-        </Typography>
-
-        <form onSubmit={handleSubmit}>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.5 }}
+    >
+      <form onSubmit={handleSubmit}>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
           <TextField
-            {...register("name", { required: "Name is required" })}
-            label={"Name"}
+            label="Name"
             fullWidth
             margin="normal"
+            disabled={!isEditing}
+            value={profile.name}
+            {...register("name", { required: "Name is required" })}
+            onChange={(e) => setProfile({ ...profile, name: e.target.value })}
             error={!!errors.name}
             helperText={errors.name?.message}
-            autoFocus
-            disabled={!isEditing}
           />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
           <TextField
+            label="Email"
+            fullWidth
+            margin="normal"
+            disabled={!isEditing}
+            value={profile.email}
             {...register("email", {
               required: "Email is required",
               pattern: {
@@ -135,20 +101,22 @@ const ProfileForm: React.FC = () => {
                 message: "Invalid email address",
               },
             })}
-            autoFocus
-            label={"Email"}
-            fullWidth
-            margin="normal"
+            onChange={(e) => setProfile({ ...profile, email: e.target.value })}
             error={!!errors.email}
             helperText={errors.email?.message}
-            disabled={!isEditing}
           />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
           <FormControl fullWidth margin="normal" error={!!errors.role}>
             <Select
               labelId="role-label"
-              {...register("role", { required: "Role is required" })}
               value={profile.role}
-              onChange={(e) => setValue("role", e.target.value)} // Corrected here
+              onChange={(e) => setProfile({ ...profile, role: e.target.value })}
               disabled={!isEditing}
             >
               <MenuItem value="USER">USER</MenuItem>
@@ -157,19 +125,34 @@ const ProfileForm: React.FC = () => {
             </Select>
             <FormHelperText>{errors.role?.message}</FormHelperText>
           </FormControl>
+        </motion.div>
 
+        <Box mt={2}>
           {isEditing ? (
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={() => handleDelete}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3 }}
             >
-              Save Changes
-            </Button>
+              <Button type="submit" variant="contained" color="primary" fullWidth>
+                Save Changes
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleCancel}
+                fullWidth
+                style={{ marginTop: "10px" }}
+              >
+                Cancel
+              </Button>
+            </motion.div>
           ) : (
-            <Box>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
               <Button
                 variant="contained"
                 color="secondary"
@@ -178,19 +161,12 @@ const ProfileForm: React.FC = () => {
               >
                 Edit Profile
               </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={handleDelete}
-                fullWidth
-              >
-                Delete Profile
-              </Button>
-            </Box>
+            </motion.div>
           )}
-        </form>
-      </Box>
-    );
+        </Box>
+      </form>
+    </motion.div>
+  );
 };
 
 export default ProfileForm;
