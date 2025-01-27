@@ -14,6 +14,7 @@ import { useAppSelector } from "./store/store";
 import Home from "./pages/homepage";
 import AllUsersPage from "./pages/alluserspage";
 import Warehouse from "./pages/warehousepage";
+import Warehousedetails from "./pages/warehousedetails";
 import ResetPassword from "./components/Auth/ResetPassword";
 import SignUp from "./pages/signup";
 import Login from "./pages/loginpage";
@@ -54,35 +55,51 @@ const App: React.FC = () => {
             path="/profile"
             element={
               <LazyComponent>
-                  <ProfilePage />
-                </LazyComponent>
+                <ProfilePage />
+              </LazyComponent>
             }
           />
           <Route
             path="/all-users"
             element={
-              <RoleAuthRoute isAuthenticated={isAuthenticated} userRoles={["ADMIN", "USER", "MANAGER"]} allowedRoles={["ADMIN"]} />
+              <RoleAuthRoute
+                isAuthenticated={isAuthenticated}
+                userRoles={["ADMIN", "USER", "MANAGER"]}
+                allowedRoles={["ADMIN"]}
+              />
             }
           >
-            <Route path="" element={
-              <LazyComponent>
-                <AllUsersPage />
-              </LazyComponent>} />
+            <Route
+              path=""
+              element={
+                <LazyComponent>
+                  <AllUsersPage />
+                </LazyComponent>
+              }
+            />
           </Route>
           <Route
             path="/warehouse"
             element={
               <LazyComponent>
-                  <Warehouse />
-                </LazyComponent>
+                <Warehouse />
+              </LazyComponent>
+            }
+          />
+          <Route
+            path="/warehouse/:id"
+            element={
+              <LazyComponent>
+                <Warehousedetails />
+              </LazyComponent>
             }
           />
           <Route
             path="/products"
             element={
               <LazyComponent>
-                  <ProductPage />
-                </LazyComponent>
+                <ProductPage />
+              </LazyComponent>
             }
           />
         </Route>

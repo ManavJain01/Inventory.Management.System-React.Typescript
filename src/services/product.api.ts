@@ -12,6 +12,12 @@ export const apiProduct = createApi({
         method: 'GET',
       }),
     }),
+    showFilteredProducts: builder.mutation({
+      query: (searchQuery) => ({
+        url: `inventory/search?query=${searchQuery}`,
+        method: 'GET',
+      }),
+    }),
     createProduct: builder.mutation<ProductResponse, [{ name: string, price: number, quantity: number, lowStockThreshold: number, warehouse_id: string }]>({
       query: (data) => ({
         url: 'inventory',
@@ -50,5 +56,5 @@ export const apiProduct = createApi({
 
 export const { 
   // Products
-  useShowProductsMutation, useCreateProductMutation, useGetProductByIdMutation, useEditProductMutation, useUpdateProductMutation, useDeleteProductMutation,
+  useShowProductsMutation, useCreateProductMutation, useGetProductByIdMutation, useEditProductMutation, useUpdateProductMutation, useDeleteProductMutation, useShowFilteredProductsMutation
  } = apiProduct;

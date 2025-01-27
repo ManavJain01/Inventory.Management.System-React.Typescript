@@ -1,6 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Button, Modal, Typography, TextField, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import { useShowManagersMutation } from '../../services/user.api';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Modal,
+  Typography,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
+import { useShowManagersMutation } from "../../services/user.api";
 
 type Warehouse = {
   _id: string;
@@ -22,9 +33,11 @@ const CreateWarehouse: React.FC<{
   // Api Calls
   const [showManagers] = useShowManagersMutation();
 
+  const navigate = useNavigate();
+
   // useState
   const [formData, setFormData] = useState<Warehouse>(
-    warehouse || { _id: '', name: '', location: '', managerId: '' }
+    warehouse || { _id: "", name: "", location: "", managerId: "" }
   );
   const [managers, setManagers] = useState<Manager[]>([]);
 
@@ -36,11 +49,13 @@ const CreateWarehouse: React.FC<{
   // Functions
   const handleManagers = async () => {
     const res = await showManagers("");
-    
+
     setManagers(res.data.data);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -55,23 +70,29 @@ const CreateWarehouse: React.FC<{
     }
   };
 
+  const handleMoreDetails = () => {
+    if (warehouse && warehouse._id) {
+      navigate(`/warehouse/${warehouse._id}`);
+    }
+  };
+
   return (
     <Modal open onClose={onClose}>
       <Box
         sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
           width: 400,
-          bgcolor: 'background.paper',
+          bgcolor: "background.paper",
           borderRadius: 2,
           boxShadow: 24,
           p: 4,
         }}
       >
         <Typography variant="h6" gutterBottom>
-          {warehouse ? 'Edit Warehouse' : 'Create Warehouse'}
+          {warehouse ? "Edit Warehouse" : "Create Warehouse"}
         </Typography>
         <TextField
           label="Name"
@@ -97,20 +118,38 @@ const CreateWarehouse: React.FC<{
             onChange={handleManagerChange}
             name="managerId"
           >
-            {Array.isArray(managers) && managers?.map((manager, index) => (
-              <MenuItem key={index} value={manager._id}>
-                {manager.name}
-              </MenuItem>
-            ))}
+            {Array.isArray(managers) &&
+              managers?.map((manager, index) => (
+                <MenuItem key={index} value={manager._id}>
+                  {manager.name}
+                </MenuItem>
+              ))}
           </Select>
         </FormControl>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "20px",
+            marginTop: 2,
+          }}
+        >
           <Button onClick={onClose} sx={{ marginRight: 1 }}>
             Cancel
           </Button>
           <Button variant="contained" color="primary" onClick={handleSubmit}>
             Save
           </Button>
+
+          {warehouse && (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={handleMoreDetails}
+            >
+              More Details
+            </Button>
+          )}
         </Box>
       </Box>
     </Modal>

@@ -45,10 +45,17 @@ export const apiWarehouse = createApi({
         method: 'DELETE'
       }),
     }),
+    showProductsByWarehouseId: builder.mutation({
+      query: (id) => ({
+        url: `warehouse/allProducts/${id}`,
+        method: 'GET'
+      }),
+    }),
   }),
 });
 
 export const { 
   // Warehouses
-  useShowWarehousesMutation, useCreateWarehouseMutation, useGetWarehouseByIdMutation, useEditWarehouseMutation, useUpdateWarehouseMutation, useDeleteWarehouseMutation
+  useShowWarehousesMutation, useCreateWarehouseMutation, useGetWarehouseByIdMutation, useEditWarehouseMutation, useUpdateWarehouseMutation, useDeleteWarehouseMutation,
+  useShowProductsByWarehouseIdMutation,
  } = apiWarehouse;
